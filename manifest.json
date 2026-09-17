@@ -1,0 +1,11 @@
+{
+  "name": "Connect 5",
+  "short_name": "Connect 5",
+  "description": "Connect 5 game with AI solver",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#242235",
+  "theme_color": "#242235",
+  "orientation": "portrait"
+}
