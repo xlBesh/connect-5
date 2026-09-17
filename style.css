@@ -1,0 +1,211 @@
+body {
+  margin: 0;
+  background: #242235;
+  font-family: Arial, sans-serif;
+  color: white;
+}
+
+.game {
+  padding: 20px;
+  text-align: center;
+}
+
+h1 {
+  margin-top: 10px;
+}
+
+.players {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.players label,
+.solver-panel {
+  background: #403959;
+  padding: 12px 16px;
+  border-radius: 12px;
+}
+
+#turn {
+  font-weight: bold;
+  margin: 20px 0;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+button,
+select {
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-weight: bold;
+}
+
+button {
+  cursor: pointer;
+}
+
+.solver-panel {
+  max-width: 400px;
+  margin: 20px auto;
+}
+
+.solver-panel h3 {
+  margin-top: 0;
+}
+
+#thinkTime {
+  margin-left: 8px;
+}
+
+#solverStatus {
+  margin-bottom: 0;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.analysis-wrap {
+  max-width: 600px;
+  margin: 25px auto;
+}
+
+.analysis {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 6px;
+  padding: 0 8px;
+  margin-bottom: 6px;
+}
+
+.analysis-cell {
+  min-width: 0;
+  min-height: 22px;
+  padding: 4px 1px;
+  border-radius: 5px;
+  background: #403959;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 11px;
+  font-weight: bold;
+  box-sizing: border-box;
+}
+
+.analysis-cell.win {
+  background: #315c50;
+}
+
+.analysis-cell.draw {
+  background: #55536a;
+}
+
+.analysis-cell.loss {
+  background: #6b3e4b;
+}
+
+.analysis-cell.unknown {
+  background: #403959;
+}
+
+.analysis-cell.closed {
+  opacity: 0.35;
+}
+
+#board {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 6px;
+
+  padding: 8px;
+  background: #403959;
+}
+
+.cell {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #242235;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.player-a {
+  background: #ff3b3b;
+}
+
+.player-b {
+  background: #ffd83d;
+}
+
+/* آخر حركة */
+.cell.last-move {
+  box-shadow:
+    inset 0 0 0 3px white,
+    0 0 0 1px white;
+}
+
+.column-numbers {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 6px;
+
+  padding: 0 8px;
+  margin-top: 7px;
+
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.legend {
+  max-width: 600px;
+  margin: 15px auto;
+
+  font-size: 11px;
+  opacity: 0.75;
+}
+
+@media (max-width: 500px) {
+  .game {
+    padding: 12px;
+  }
+
+  h1 {
+    font-size: 25px;
+  }
+
+  .players {
+    gap: 6px;
+  }
+
+  .players label {
+    padding: 10px 9px;
+    font-size: 12px;
+  }
+
+  #board,
+  .analysis,
+  .column-numbers {
+    gap: 4px;
+  }
+
+  #board {
+    padding: 6px;
+  }
+
+  .analysis,
+  .column-numbers {
+    padding: 0 6px;
+  }
+
+  .analysis-cell {
+    font-size: 9px;
+  }
+}
