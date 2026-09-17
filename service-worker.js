@@ -1,11 +1,13 @@
-const CACHE_NAME = "connect5-v1";
+const CACHE_NAME = "connect5-v2";
 
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
   "./style.css",
   "./script.js",
-  "./manifest.json"
+  "./manifest.json",
+  "./icon-192.png",
+  "./icon-512.png"
 ];
 
 self.addEventListener("install", (event) => {
