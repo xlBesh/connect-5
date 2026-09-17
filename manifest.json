@@ -1,4 +1,5 @@
 {
+  "id": "./",
   "name": "Connect 5",
   "short_name": "Connect 5",
   "description": "Connect 5 game with AI solver",
@@ -8,6 +9,7 @@
   "background_color": "#242235",
   "theme_color": "#242235",
   "orientation": "portrait",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "./icon-192.png",
