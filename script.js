@@ -60,15 +60,8 @@ function buildWindows() {
     ) {
       const line = [];
 
-      for (
-        let i = 0;
-        i < CONNECT;
-        i++
-      ) {
-        line.push([
-          r,
-          c + i
-        ]);
+      for (let i = 0; i < CONNECT; i++) {
+        line.push([r, c + i]);
       }
 
       WINDOWS.push(line);
@@ -84,15 +77,8 @@ function buildWindows() {
     for (let c = 0; c < cols; c++) {
       const line = [];
 
-      for (
-        let i = 0;
-        i < CONNECT;
-        i++
-      ) {
-        line.push([
-          r + i,
-          c
-        ]);
+      for (let i = 0; i < CONNECT; i++) {
+        line.push([r + i, c]);
       }
 
       WINDOWS.push(line);
@@ -112,15 +98,8 @@ function buildWindows() {
     ) {
       const line = [];
 
-      for (
-        let i = 0;
-        i < CONNECT;
-        i++
-      ) {
-        line.push([
-          r + i,
-          c + i
-        ]);
+      for (let i = 0; i < CONNECT; i++) {
+        line.push([r + i, c + i]);
       }
 
       WINDOWS.push(line);
@@ -140,15 +119,8 @@ function buildWindows() {
     ) {
       const line = [];
 
-      for (
-        let i = 0;
-        i < CONNECT;
-        i++
-      ) {
-        line.push([
-          r + i,
-          c - i
-        ]);
+      for (let i = 0; i < CONNECT; i++) {
+        line.push([r + i, c - i]);
       }
 
       WINDOWS.push(line);
@@ -171,9 +143,7 @@ function emptyGame() {
 }
 
 function otherPlayer(player) {
-  return player === "A"
-    ? "B"
-    : "A";
+  return player === "A" ? "B" : "A";
 }
 
 function newGame() {
@@ -217,12 +187,8 @@ function newGame() {
   }
 
   clearAnalysis();
-
   updateTurn();
-
-  updateSolverStatus(
-    "Ready"
-  );
+  updateSolverStatus("Ready");
 }
 
 function isAI() {
@@ -245,32 +211,21 @@ function legalMoves() {
   return result;
 }
 
-function makeMove(
-  col,
-  player
-) {
-  const row =
-    heights[col];
+function makeMove(col, player) {
+  const row = heights[col];
 
   if (row < 0) {
     return -1;
   }
 
-  game[row][col] =
-    player;
-
+  game[row][col] = player;
   heights[col]--;
 
   return row;
 }
 
-function unmakeMove(
-  col,
-  row
-) {
-  game[row][col] =
-    null;
-
+function unmakeMove(col, row) {
+  game[row][col] = null;
   heights[col]++;
 }
 
@@ -283,14 +238,10 @@ function playMove(col) {
     return;
   }
 
-  const player =
-    currentPlayer;
+  const player = currentPlayer;
 
   const row =
-    makeMove(
-      col,
-      player
-    );
+    makeMove(col, player);
 
   history.push({
     row,
@@ -378,14 +329,9 @@ function drawCell(
       : "cell player-b";
 }
 
-function markLastMove(
-  row,
-  col
-) {
+function markLastMove(row, col) {
   board
-    .querySelectorAll(
-      ".last-move"
-    )
+    .querySelectorAll(".last-move")
     .forEach(cell => {
       cell.classList.remove(
         "last-move"
@@ -406,18 +352,14 @@ function markLastMove(
 
 function refreshLastMove() {
   board
-    .querySelectorAll(
-      ".last-move"
-    )
+    .querySelectorAll(".last-move")
     .forEach(cell => {
       cell.classList.remove(
         "last-move"
       );
     });
 
-  if (
-    history.length === 0
-  ) {
+  if (history.length === 0) {
     return;
   }
 
@@ -465,23 +407,21 @@ function checkFive(
   ) {
     let total = 1;
 
-    total +=
-      countDirection(
-        row,
-        col,
-        dr,
-        dc,
-        player
-      );
+    total += countDirection(
+      row,
+      col,
+      dr,
+      dc,
+      player
+    );
 
-    total +=
-      countDirection(
-        row,
-        col,
-        -dr,
-        -dc,
-        player
-      );
+    total += countDirection(
+      row,
+      col,
+      -dr,
+      -dc,
+      player
+    );
 
     if (total >= CONNECT) {
       return true;
@@ -500,11 +440,8 @@ function countDirection(
 ) {
   let total = 0;
 
-  let r =
-    row + dr;
-
-  let c =
-    col + dc;
+  let r = row + dr;
+  let c = col + dc;
 
   while (
     r >= 0 &&
@@ -522,21 +459,13 @@ function countDirection(
   return total;
 }
 
-function wouldWin(
-  col,
-  player
-) {
-  if (
-    heights[col] < 0
-  ) {
+function wouldWin(col, player) {
+  if (heights[col] < 0) {
     return false;
   }
 
   const row =
-    makeMove(
-      col,
-      player
-    );
+    makeMove(col, player);
 
   const result =
     checkFive(
@@ -575,14 +504,192 @@ function winningMoves(player) {
 
 
 // ========================================
+// FUTURE THREAT HELPERS
+// ========================================
+
+// 0 = الخانة قابلة للعب الآن
+// 1 = تحتاج قطعة واحدة تحتها
+// 2 = تحتاج قطعتين... إلخ
+function supportDepth(row, col) {
+  if (game[row][col] !== null) {
+    return -1;
+  }
+
+  const playableRow =
+    heights[col];
+
+  if (playableRow < row) {
+    return Infinity;
+  }
+
+  return playableRow - row;
+}
+
+
+// قيمة الخانة الفارغة حسب
+// مدى قربها من أن تصبح قابلة للعب.
+function supportWeight(depth) {
+  if (depth === 0) {
+    return 1.0;
+  }
+
+  if (depth === 1) {
+    return 0.55;
+  }
+
+  if (depth === 2) {
+    return 0.25;
+  }
+
+  if (depth === 3) {
+    return 0.11;
+  }
+
+  if (depth === 4) {
+    return 0.05;
+  }
+
+  return 0.02;
+}
+
+
+// يقيس قوة الخطوط المستقبلية للاعب.
+// لا يعني أنها فوز مثبت.
+// هذه فقط قيمة heuristic.
+function futureThreatScore(player) {
+  const opponent =
+    otherPlayer(player);
+
+  let total = 0;
+
+  for (const line of WINDOWS) {
+    let mine = 0;
+    let enemy = 0;
+
+    const emptyCells = [];
+
+    for (
+      const [r, c]
+      of line
+    ) {
+      const value =
+        game[r][c];
+
+      if (value === player) {
+        mine++;
+      }
+
+      else if (
+        value === opponent
+      ) {
+        enemy++;
+      }
+
+      else {
+        emptyCells.push([
+          r,
+          c
+        ]);
+      }
+    }
+
+    // خط مختلط لا يستطيع أي لاعب
+    // إكماله إلى خمسة.
+    if (enemy > 0) {
+      continue;
+    }
+
+    if (mine === 0) {
+      continue;
+    }
+
+    let accessibility = 0;
+    let nearest = Infinity;
+    let furthest = 0;
+
+    for (
+      const [r, c]
+      of emptyCells
+    ) {
+      const depth =
+        supportDepth(r, c);
+
+      if (
+        depth === Infinity
+      ) {
+        continue;
+      }
+
+      accessibility +=
+        supportWeight(depth);
+
+      nearest =
+        Math.min(
+          nearest,
+          depth
+        );
+
+      furthest =
+        Math.max(
+          furthest,
+          depth
+        );
+    }
+
+    if (mine === 4) {
+      // أربعة موجودة بالفعل.
+      // حتى لو الخامسة معلقة،
+      // نريد أن يتذكرها الـAI.
+      total +=
+        8000 +
+        accessibility * 22000;
+
+      if (nearest === 0) {
+        total += 30000;
+      }
+
+      else if (nearest === 1) {
+        total += 9000;
+      }
+
+      else if (nearest === 2) {
+        total += 3500;
+      }
+    }
+
+    else if (mine === 3) {
+      total +=
+        900 +
+        accessibility * 2600;
+
+      if (furthest <= 1) {
+        total += 1800;
+      }
+    }
+
+    else if (mine === 2) {
+      total +=
+        100 +
+        accessibility * 350;
+    }
+
+    else if (mine === 1) {
+      total +=
+        accessibility * 20;
+    }
+  }
+
+  return total;
+}
+
+
+// ========================================
 // TIME CONTROL
 // ========================================
 
 function outOfTime() {
   nodes++;
 
-  // لا نفحص الساعة في كل عقدة.
-  // هذا أسرع على الجوال.
   if (
     (nodes & 255) !== 0
   ) {
@@ -689,10 +796,7 @@ function exactKey(player) {
 // POSITION EVALUATION
 // ========================================
 
-function isPlayable(
-  row,
-  col
-) {
+function isPlayable(row, col) {
   return (
     heights[col] === row
   );
@@ -710,7 +814,11 @@ function evaluate(player) {
   ) {
     let mine = 0;
     let enemy = 0;
+
     let playable = 0;
+
+    let myAccess = 0;
+    let enemyAccess = 0;
 
     for (
       const [r, c]
@@ -731,16 +839,25 @@ function evaluate(player) {
         enemy++;
       }
 
-      else if (
-        isPlayable(r, c)
-      ) {
-        playable++;
+      else {
+        const depth =
+          supportDepth(
+            r,
+            c
+          );
+
+        if (depth === 0) {
+          playable++;
+        }
+
+        const weight =
+          supportWeight(depth);
+
+        myAccess += weight;
+        enemyAccess += weight;
       }
     }
 
-    // وجود اللونين يعني أن
-    // الخط لا يمكن أن يصبح Connect 5
-    // لأي واحد منهما.
     if (
       mine > 0 &&
       enemy > 0
@@ -751,48 +868,56 @@ function evaluate(player) {
     if (enemy === 0) {
       if (mine === 4) {
         score +=
-          playable > 0
-            ? 30000
-            : 5000;
+          6000 +
+          myAccess * 22000;
+
+        if (playable > 0) {
+          score += 28000;
+        }
       }
 
       else if (
         mine === 3
       ) {
         score +=
-          1200 +
-          playable * 900;
+          1100 +
+          myAccess * 2600;
       }
 
       else if (
         mine === 2
       ) {
         score +=
-          160 +
-          playable * 80;
+          150 +
+          myAccess * 380;
       }
 
       else if (
         mine === 1
       ) {
-        score += 12;
+        score +=
+          10 +
+          myAccess * 20;
       }
     }
 
     if (mine === 0) {
       if (enemy === 4) {
         score -=
-          playable > 0
-            ? 34000
-            : 5500;
+          7000 +
+          enemyAccess * 25000;
+
+        if (playable > 0) {
+          score -= 32000;
+        }
       }
 
       else if (
         enemy === 3
       ) {
         score -=
-          1400 +
-          playable * 1000;
+          1350 +
+          enemyAccess * 3200;
       }
 
       else if (
@@ -800,10 +925,29 @@ function evaluate(player) {
       ) {
         score -=
           180 +
-          playable * 90;
+          enemyAccess * 430;
+      }
+
+      else if (
+        enemy === 1
+      ) {
+        score -=
+          enemyAccess * 15;
       }
     }
   }
+
+  // طبقة إضافية للخطط بعيدة المدى.
+  // الدفاع أثقل قليلًا من الهجوم
+  // حتى لا يسمح للخصم ببناء فخ واضح.
+  const ownFuture =
+    futureThreatScore(player);
+
+  const enemyFuture =
+    futureThreatScore(opponent);
+
+  score += ownFuture * 0.35;
+  score -= enemyFuture * 0.45;
 
   // قيمة إضافية للوسط.
   for (
@@ -838,6 +982,12 @@ function orderedMoves(player) {
 
   const moves =
     legalMoves();
+
+  const beforeOwnFuture =
+    futureThreatScore(player);
+
+  const beforeEnemyFuture =
+    futureThreatScore(opponent);
 
   const scored =
     moves.map(col => {
@@ -884,10 +1034,46 @@ function orderedMoves(player) {
         ).length;
 
       score +=
-        ownWins * 20000;
+        ownWins * 22000;
 
       score -=
-        enemyWins * 40000;
+        enemyWins * 50000;
+
+      // كيف غيّرت هذه الحركة
+      // الخطط المستقبلية؟
+      const afterOwnFuture =
+        futureThreatScore(
+          player
+        );
+
+      const afterEnemyFuture =
+        futureThreatScore(
+          opponent
+        );
+
+      const ownImprovement =
+        afterOwnFuture -
+        beforeOwnFuture;
+
+      const enemyImprovement =
+        afterEnemyFuture -
+        beforeEnemyFuture;
+
+      // كافئ بناء فخ لنا.
+      score +=
+        ownImprovement * 0.22;
+
+      // وعاقب بشدة الحركة التي
+      // تساعد الخصم على تجهيز فخه.
+      score -=
+        enemyImprovement * 0.38;
+
+      // إذا أصبحت للخصم عدة
+      // تهديدات مباشرة بعد حركتنا،
+      // فهذه حركة سيئة جدًا.
+      if (enemyWins >= 2) {
+        score -= 400000;
+      }
 
       unmakeMove(
         col,
@@ -935,7 +1121,6 @@ function negamax(
     return 0;
   }
 
-  // اللاعب الحالي يستطيع الفوز الآن.
   for (const col of moves) {
     if (
       wouldWin(
@@ -958,8 +1143,6 @@ function negamax(
       opponent
     );
 
-  // الخصم لديه مكانان مختلفان
-  // للفوز بالحركة القادمة.
   if (
     enemyWins.length >= 2
   ) {
@@ -970,9 +1153,7 @@ function negamax(
   }
 
   if (depth <= 0) {
-    return evaluate(
-      player
-    );
+    return evaluate(player);
   }
 
   let candidates;
@@ -980,7 +1161,6 @@ function negamax(
   if (
     enemyWins.length === 1
   ) {
-    // الحركة إجبارية.
     candidates = [
       enemyWins[0]
     ];
@@ -988,9 +1168,7 @@ function negamax(
 
   else {
     candidates =
-      orderedMoves(
-        player
-      );
+      orderedMoves(player);
   }
 
   const key =
@@ -1107,9 +1285,7 @@ function searchBestMove(
   table.clear();
 
   let moves =
-    orderedMoves(
-      player
-    );
+    orderedMoves(player);
 
   if (
     moves.length === 0
@@ -1129,7 +1305,6 @@ function searchBestMove(
 
   let completedDepth = 0;
 
-  // فوز مباشر.
   for (
     const col
     of moves
@@ -1152,11 +1327,8 @@ function searchBestMove(
     otherPlayer(player);
 
   const enemyWins =
-    winningMoves(
-      opponent
-    );
+    winningMoves(opponent);
 
-  // صد الخطر المباشر.
   if (
     enemyWins.length === 1
   ) {
@@ -1191,9 +1363,7 @@ function searchBestMove(
       Infinity;
 
     const rootMoves =
-      orderedMoves(
-        player
-      );
+      orderedMoves(player);
 
     for (
       const col
@@ -1278,9 +1448,7 @@ function searchBestMove(
       depth;
 
     if (
-      Math.abs(
-        bestScore
-      ) >=
+      Math.abs(bestScore) >=
       WIN_SCORE - 100
     ) {
       break;
@@ -1325,7 +1493,6 @@ function exactSolve(
     };
   }
 
-  // فوز مباشر.
   for (
     const col
     of moves
@@ -1369,9 +1536,7 @@ function exactSolve(
     false;
 
   const ordered =
-    orderedMoves(
-      player
-    );
+    orderedMoves(player);
 
   for (
     const col
@@ -1427,8 +1592,6 @@ function exactSolve(
       continue;
     }
 
-    // إذا الخصم خاسر بعد حركتنا
-    // فنحن نستطيع إجبار الفوز.
     if (
       child.type ===
       "LOSS"
@@ -1624,11 +1787,6 @@ function analyzePosition() {
       0
     );
 
-  // في بداية المباراة لا نحاول
-  // قتل الجوال بحل 63 خانة كاملة.
-  //
-  // كلما اقتربنا من النهاية نعطي
-  // الـExact Solver وقتًا أطول.
   let analysisTime;
 
   if (empties <= 14) {
@@ -1796,25 +1954,18 @@ function aiMove() {
 
   // 1. Win immediately
   const wins =
-    winningMoves(
-      player
-    );
+    winningMoves(player);
 
   if (
     wins.length > 0
   ) {
-    playMove(
-      wins[0]
-    );
-
+    playMove(wins[0]);
     return;
   }
 
   // 2. Block immediate loss
   const enemyWins =
-    winningMoves(
-      opponent
-    );
+    winningMoves(opponent);
 
   if (
     enemyWins.length > 0
@@ -1855,9 +2006,7 @@ function aiMove() {
 // ========================================
 
 function updateSolverStatus(text) {
-  if (
-    solverStatus
-  ) {
+  if (solverStatus) {
     solverStatus.textContent =
       text;
   }
@@ -1926,9 +2075,7 @@ document.getElementById(
     move.col
   ]++;
 
-  redoStack.push(
-    move
-  );
+  redoStack.push(move);
 
   const cell =
     board.querySelector(
@@ -1979,9 +2126,7 @@ document.getElementById(
     move.col
   ]--;
 
-  history.push(
-    move
-  );
+  history.push(move);
 
   drawCell(
     move.row,
